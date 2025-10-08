@@ -1,10 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function BMIPage({ setCurrentPage, bmiData, setBmiData, calculateBMI }) {
+function BMIPage() {
+  const navigate = useNavigate();
+  const [bmiData, setBmiData] = useState({ height: '', weight: '', result: null });
+
+  const calculateBMI = () => {
+    const h = parseFloat(bmiData.height) / 100;
+    const w = parseFloat(bmiData.weight);
+    if (h > 0 && w > 0) {
+      const bmi = (w / (h * h)).toFixed(1);
+      let category = '';
+      if (bmi < 18.5) category = '低体重';
+      else if (bmi < 25) category = '普通体重';
+      else if (bmi < 30) category = '肥満(1度)';
+      else if (bmi < 35) category = '肥満(2度)';
+      else if (bmi < 40) category = '肥満(3度)';
+      else category = '肥満(4度)';
+      setBmiData({ ...bmiData, result: { bmi, category } });
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
       <button
-        onClick={() => setCurrentPage('home')}
+        onClick={() => navigate('/')}
         className="mb-6 text-blue-600 hover:text-blue-800 flex items-center"
       >
         ← トップページに戻る

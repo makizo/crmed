@@ -1,13 +1,15 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { steroidData } from '../data/steroidData';
 
-function SteroidPage({ setCurrentPage }) {
+function SteroidPage() {
+  const navigate = useNavigate();
   const colors = ['#dc2626', '#ea580c', '#ca8a04', '#16a34a', '#3b82f6'];
 
   return (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
       <button
-        onClick={() => setCurrentPage('home')}
+        onClick={() => navigate('/')}
         className="mb-6 text-blue-600 hover:text-blue-800 flex items-center"
       >
         ← トップページに戻る

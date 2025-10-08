@@ -1,10 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function HbA1cPage({ setCurrentPage, hba1cData, setHba1cData, calculateAvgGlucose }) {
+function HbA1cPage() {
+  const navigate = useNavigate();
+  const [hba1cData, setHba1cData] = useState({ hba1c: '', result: null });
+
+  const calculateAvgGlucose = () => {
+    const hba1c = parseFloat(hba1cData.hba1c);
+    if (hba1c > 0) {
+      const avgGlucose = (28.7 * hba1c - 46.7).toFixed(0);
+      setHba1cData({ ...hba1cData, result: avgGlucose });
+    }
+  };
+
   return (
     <div className="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
       <button
-        onClick={() => setCurrentPage('home')}
+        onClick={() => navigate('/')}
         className="mb-6 text-blue-600 hover:text-blue-800 flex items-center"
       >
         ← トップページに戻る
