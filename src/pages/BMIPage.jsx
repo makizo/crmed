@@ -231,12 +231,12 @@ function BMIPage() {
           <h3 className="text-xl font-bold mb-4">【計算結果】</h3>
           
           <div className="space-y-2 mb-4">
-            <p><strong>現在のBMI：</strong>{result.curBMI} （{result.category}）</p>
-            <p><strong>ベスト体重：</strong>{result.bestbw} kg</p>
-            <p><strong>必要増減量：</strong>{result.bestbwDiff} kg</p>
+            <p><strong>現在のBMI：</strong>{result.curBMI} 【 {result.category} 】</p>
+            <p><strong>ベストな体重：</strong>{result.bestbw} ( {result.bestbwDiff} ) kg</p>
+            <p><strong>必要な増減量：</strong>{result.bestbwDiff} kg</p>
             <p>
-              <strong>適正体重範囲：</strong>
-              {result.minWeight} ({result.minWeightDiff}) kg ～ {result.maxWeight} ({result.maxWeightDiff}) kg
+              <strong>身長から算出される適正体重範囲：</strong>
+              {result.minWeight} ( {result.minWeightDiff} ) kg ～ {result.maxWeight} ( {result.maxWeightDiff} ) kg
             </p>
           </div>
 
