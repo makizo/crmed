@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import BMIPage from './pages/BMIPage';
 import HbA1cPage from './pages/HbA1cPage';
 import SteroidPage from './pages/SteroidPage';
+import ExtMedValuePage from './pages/ExtMedValuePage';
 
 function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -53,6 +54,7 @@ function App() {
         />
       )}
       {currentPage === 'steroid' && <SteroidPage setCurrentPage={setCurrentPage} />}
+      {currentPage === 'extmedvalue' && <ExtMedValuePage setCurrentPage={setCurrentPage} />}
     </div>
   );
 }

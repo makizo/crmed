@@ -31,6 +31,14 @@ function HomePage({ setCurrentPage }) {
           <h2 className="text-xl font-bold mb-2">ステロイド一覧</h2>
           <p className="text-gray-600">外用ステロイド剤の強さ分類表</p>
         </div>
+        <div
+          onClick={() => setCurrentPage('extmedvalue')}
+          className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer border-2 border-purple-100 hover:border-purple-300"
+        >
+          <div className="text-4xl mb-4">💊</div>
+          <h2 className="text-xl font-bold mb-2">外用剤単位用量一覧</h2>
+          <p className="text-gray-600">外用剤の単位用量辺りの内容量一覧</p>
+        </div>
       </div>
     </div>
   );
