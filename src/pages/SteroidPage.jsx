@@ -43,15 +43,6 @@ function SteroidPage() {
           </div>
         ))}
       </div>
-
-      <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-4 rounded">
-        <p className="font-medium mb-2">使用上の注意</p>
-        <ul className="space-y-1 list-disc list-inside">
-          <li>顔面や陰部には弱いランクのステロイドを使用</li>
-          <li>長期連用は副作用のリスクが高まります</li>
-          <li>医師の指示に従って使用してください</li>
-        </ul>
-      </div>
     </div>
   );
 }
