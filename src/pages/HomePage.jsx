@@ -60,6 +60,14 @@ function HomePage() {
           <h2 className="text-xl font-bold mb-2">外用剤検索</h2>
           <p className="text-gray-600">薬剤名でインクリメンタルサーチ</p>
         </div>
+        <div
+          onClick={() => navigate('/reservation')}
+          className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer border-2 border-blue-100 hover:border-blue-300"
+>
+          <div className="text-4xl mb-4">📅</div>
+          <h2 className="text-xl font-bold mb-2">予約システム</h2>
+          <p className="text-gray-600">水・土の診療予約（15分刻み）</p>
+        </div>
       </div>
     </div>
   );

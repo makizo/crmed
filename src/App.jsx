@@ -5,8 +5,9 @@ import BMIPage from './pages/BMIPage';
 import HbA1cPage from './pages/HbA1cPage';
 import SteroidPage from './pages/SteroidPage';
 import ExtMedValuePage from './pages/ExtMedValuePage';
-import ExtMedSearchPage from './pages/ExtMedSearchPage';  // 追加
+import ExtMedSearchPage from './pages/ExtMedSearchPage';
 import DNStagePage from './pages/DNStagePage';
+import ReservationPage from './pages/ReservationPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/extmedvalue" element={<ExtMedValuePage />} />
         <Route path="/extmedsearch" element={<ExtMedSearchPage />} />  {/* 追加 */}
         <Route path="/dnstage" element={<DNStagePage />} />
+        <Route path="/reservation" element={<ReservationPage />} />
       </Routes>
     </div>
   );
