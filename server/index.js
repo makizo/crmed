@@ -38,6 +38,7 @@ async function initDatabase() {
     await db.exec(`
       CREATE TABLE IF NOT EXISTS reservations (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        customer_id TEXT NOT NULL,
         date TEXT NOT NULL,
         time TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -94,24 +95,52 @@ app.get('/api/reservations/:date', async (req, res) => {
   }
 });
 
+// 特定日の予約数取得
+app.get('/api/reservations-count/:date', async (req, res) => {
+  try {
+    if (!db) {
+      return res.status(500).json({ error: 'Database not initialized' });
+    }
+    const { date } = req.params;
+    const result = await db.get(
+      'SELECT COUNT(*) as count FROM reservations WHERE date = ?',
+      [date]
+    );
+    res.json({ date, count: result.count, max: 5, isFull: result.count >= 5 });
+  } catch (error) {
+    console.error('Get reservation count error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // 予約作成
 app.post('/api/reservations', async (req, res) => {
   try {
     if (!db) {
       return res.status(500).json({ error: 'Database not initialized' });
     }
-    
-    const { date, time } = req.body;
-    
-    if (!date || !time) {
-      return res.status(400).json({ error: 'date and time are required' });
+
+    const { date, time, customer_id } = req.body;
+
+    if (!date || !time || !customer_id) {
+      return res.status(400).json({ error: 'date, time, and customer_id are required' });
     }
 
-    console.log('Creating reservation:', { date, time });
+    // 同日の予約数確認（上限5件）
+    const reservationCount = await db.get(
+      'SELECT COUNT(*) as count FROM reservations WHERE date = ?',
+      [date]
+    );
+
+    if (reservationCount.count >= 5) {
+      return res.status(409).json({ error: 'この日付は予約上限に達しています' });
+    }
+
+    console.log('Creating reservation:', { date, time, customer_id });
 
     const result = await db.run(
-      'INSERT INTO reservations (date, time) VALUES (?, ?)',
-      [date, time]
+      'INSERT INTO reservations (date, time, customer_id) VALUES (?, ?, ?)',
+      [date, time, customer_id]
     );
 
     const newReservation = await db.get(

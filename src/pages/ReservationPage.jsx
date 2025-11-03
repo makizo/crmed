@@ -9,6 +9,8 @@ function ReservationPage() {
   const [dayReservations, setDayReservations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [serverStatus, setServerStatus] = useState('checking');
+  const [reservationCounts, setReservationCounts] = useState({});
+  const [customerId, setCustomerId] = useState('');
 
   const API_BASE = 'http://localhost:3001/api';
 
@@ -47,6 +49,13 @@ function ReservationPage() {
     }
   }, [selectedDate, serverStatus]);
 
+  // 月の予約数を一括取得
+  useEffect(() => {
+    if (serverStatus === 'connected') {
+      fetchMonthReservationCounts();
+    }
+  }, [currentMonth, serverStatus]);
+
   const fetchAllReservations = async () => {
     try {
       console.log('Fetching all reservations...');
@@ -69,11 +78,11 @@ function ReservationPage() {
     try {
       console.log('Fetching reservations for date:', date);
       const response = await fetch(`${API_BASE}/reservations/${date}`);
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log('Day reservations:', data);
       setDayReservations(data);
@@ -83,29 +92,61 @@ function ReservationPage() {
     }
   };
 
+  const fetchMonthReservationCounts = async () => {
+    try {
+      const calendars = generateCalendar(currentMonth);
+      const counts = {};
+
+      for (const cal of calendars) {
+        for (const week of cal.weeks) {
+          for (const dayObj of week) {
+            if (dayObj && (dayObj.isWednesday || dayObj.isSaturday)) {
+              const response = await fetch(`${API_BASE}/reservations-count/${dayObj.dateStr}`);
+              if (response.ok) {
+                const data = await response.json();
+                counts[dayObj.dateStr] = data.count;
+              }
+            }
+          }
+        }
+      }
+
+      setReservationCounts(counts);
+    } catch (error) {
+      console.error('予約数取得エラー:', error);
+    }
+  };
+
   const createReservation = async (date, time) => {
+    if (!customerId.trim()) {
+      alert('顧客IDを入力してください');
+      return;
+    }
+
     setLoading(true);
     try {
-      console.log('Creating reservation:', { date, time });
-      
+      console.log('Creating reservation:', { date, time, customer_id: customerId });
+
       const response = await fetch(`${API_BASE}/reservations`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        body: JSON.stringify({ date, time })
+        body: JSON.stringify({ date, time, customer_id: customerId })
       });
 
       console.log('Response status:', response.status);
-      
+
       const data = await response.json();
       console.log('Response data:', data);
 
       if (response.ok) {
-        alert(`予約完了: ${date} ${time}`);
+        alert(`予約完了: ${date} ${time} (顧客ID: ${customerId})`);
+        setCustomerId('');
         await fetchAllReservations();
         await fetchDayReservations(date);
+        await fetchMonthReservationCounts();
       } else {
         alert(`予約に失敗しました: ${data.error || 'Unknown error'}`);
       }
@@ -234,17 +275,28 @@ function ReservationPage() {
         </div>
       )}
 
+      <div className="mb-6 bg-blue-50 border border-blue-200 p-4 rounded">
+        <label className="block text-sm font-bold mb-2">顧客ID</label>
+        <input
+          type="text"
+          value={customerId}
+          onChange={(e) => setCustomerId(e.target.value)}
+          placeholder="顧客IDを入力してください"
+          className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
       <div className="flex gap-6">
         {/* 左側: カレンダー */}
         <div className="w-1/2">
           <h3 className="text-xl font-bold mb-4">カレンダー（水・土のみ予約可能）</h3>
-          
+
           {calendars.map((cal, calIndex) => (
             <div key={calIndex} className="mb-6">
               <h4 className="text-lg font-bold mb-2">
                 {cal.year}年 {cal.month + 1}月
               </h4>
-              
+
               <table className="w-full border-collapse border border-gray-300">
                 <thead>
                   <tr className="bg-gray-100">
@@ -260,25 +312,35 @@ function ReservationPage() {
                 <tbody>
                   {cal.weeks.map((week, weekIndex) => (
                     <tr key={weekIndex}>
-                      {week.map((dayObj, dayIndex) => (
-                        <td
-                          key={dayIndex}
-                          className={`border border-gray-300 p-2 text-center h-12 ${
-                            dayObj && (dayObj.isWednesday || dayObj.isSaturday)
-                              ? 'cursor-pointer hover:bg-blue-100'
-                              : 'bg-gray-50'
-                          } ${
-                            selectedDate === dayObj?.dateStr ? 'bg-blue-200 font-bold' : ''
-                          }`}
-                          onClick={() => {
-                            if (dayObj && (dayObj.isWednesday || dayObj.isSaturday)) {
-                              setSelectedDate(dayObj.dateStr);
-                            }
-                          }}
-                        >
-                          {dayObj ? dayObj.day : ''}
-                        </td>
-                      ))}
+                      {week.map((dayObj, dayIndex) => {
+                        const reservationCount = dayObj ? (reservationCounts[dayObj.dateStr] || 0) : 0;
+                        const isFull = reservationCount >= 5;
+                        const isReservableDay = dayObj && (dayObj.isWednesday || dayObj.isSaturday);
+
+                        let cellBgColor = 'bg-gray-50';
+                        if (isReservableDay) {
+                          cellBgColor = isFull ? 'bg-red-200' : 'bg-green-200';
+                        }
+
+                        return (
+                          <td
+                            key={dayIndex}
+                            className={`border border-gray-300 p-2 text-center h-12 ${cellBgColor} ${
+                              isReservableDay ? 'cursor-pointer hover:opacity-80' : ''
+                            } ${selectedDate === dayObj?.dateStr ? 'ring-2 ring-blue-500 font-bold' : ''}`}
+                            onClick={() => {
+                              if (isReservableDay) {
+                                setSelectedDate(dayObj.dateStr);
+                              }
+                            }}
+                          >
+                            <div>{dayObj ? dayObj.day : ''}</div>
+                            {isReservableDay && (
+                              <div className="text-xs text-gray-700">{reservationCount}/5</div>
+                            )}
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))}
                 </tbody>
@@ -287,40 +349,64 @@ function ReservationPage() {
           ))}
         </div>
 
-        {/* 右側: 時間帯選択 */}
+        {/* 右側: 時間帯選択と予約一覧 */}
         <div className="w-1/2">
           {selectedDate ? (
             <>
               <h3 className="text-xl font-bold mb-4">
-                {selectedDate} の予約時間
+                {selectedDate} の予約
               </h3>
-              
+
               {loading && (
                 <div className="bg-blue-50 border border-blue-200 p-3 rounded mb-4 text-center">
                   処理中...
                 </div>
               )}
-              
-              <div className="space-y-1 max-h-[600px] overflow-y-auto">
-                {timeSlots.map((time, index) => {
-                  const reserved = isReserved(time);
-                  
-                  return (
-                    <div
-                      key={index}
-                      onClick={() => !reserved && !loading && handleTimeSlotClick(time)}
-                      className={`border border-gray-300 p-3 rounded text-center ${
-                        reserved
-                          ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                          : loading
-                          ? 'bg-gray-100 cursor-wait'
-                          : 'bg-white hover:bg-green-100 cursor-pointer'
-                      }`}
-                    >
-                      {time} {reserved && '（予約済み）'}
-                    </div>
-                  );
-                })}
+
+              {/* 予約一覧 */}
+              <div className="mb-6">
+                <h4 className="font-bold mb-2">現在の予約 ({dayReservations.length}/5)</h4>
+                <div className="bg-gray-50 p-3 rounded border border-gray-200 max-h-[200px] overflow-y-auto">
+                  {dayReservations.length === 0 ? (
+                    <p className="text-gray-500 text-sm">予約がありません</p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {dayReservations.map((res) => (
+                        <li key={res.id} className="text-sm p-2 bg-white border border-gray-300 rounded">
+                          <span className="font-bold text-blue-600">{res.time}</span>
+                          {' - '}
+                          <span className="text-gray-700">顧客ID: {res.customer_id}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              </div>
+
+              {/* 予約可能時間スロット */}
+              <div>
+                <h4 className="font-bold mb-2">予約可能な時間</h4>
+                <div className="space-y-1 max-h-[400px] overflow-y-auto">
+                  {timeSlots.map((time, index) => {
+                    const reserved = isReserved(time);
+
+                    return (
+                      <div
+                        key={index}
+                        onClick={() => !reserved && !loading && handleTimeSlotClick(time)}
+                        className={`border border-gray-300 p-3 rounded text-center ${
+                          reserved
+                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            : loading
+                            ? 'bg-gray-100 cursor-wait'
+                            : 'bg-white hover:bg-green-100 cursor-pointer'
+                        }`}
+                      >
+                        {time} {reserved && '（予約済み）'}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </>
           ) : (
@@ -334,9 +420,13 @@ function ReservationPage() {
       <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-4 rounded">
         <p className="font-medium mb-2">使い方</p>
         <ul className="space-y-1 list-disc list-inside">
-          <li>カレンダーの水曜日または土曜日をクリックすると、その日の予約可能時間が表示されます</li>
+          <li>顧客IDを入力してください</li>
+          <li>カレンダーの水曜日または土曜日（色付き）をクリックすると、その日の予約情報が表示されます</li>
+          <li>緑色の日付: 予約に空きあり（空き/5）</li>
+          <li>赤色の日付: 予約が満杯</li>
           <li>予約可能な時間帯をクリックすると予約が完了します</li>
           <li>診療時間: 午前 9:00-12:00 / 午後 14:00-18:00（15分刻み）</li>
+          <li>各日の予約上限: 5枠</li>
         </ul>
       </div>
 
@@ -346,6 +436,7 @@ function ReservationPage() {
         <p>選択日: {selectedDate || '未選択'}</p>
         <p>全予約数: {reservations.length}件</p>
         <p>本日の予約数: {dayReservations.length}件</p>
+        <p>顧客ID: {customerId || '未入力'}</p>
         <p className="mt-2 text-xs">
           ※ブラウザの開発者ツール（F12）のConsoleタブで詳細なログを確認できます
         </p>
