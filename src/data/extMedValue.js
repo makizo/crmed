@@ -28,5 +28,15 @@ export const extMedValue = [
     medName: 'ナゾネックス56噴霧', 
     contentValue: '10g',
     yomi: 'nazonekkusu'
+  },
+  {
+    medName: 'ヒルドイドローション・ゲル',
+    contentValue: '25g',
+    yomi: 'hirudoido'
+  },
+  {
+    medName: 'ヒルドイドローション・ゲル',
+    contentValue: '50g',
+    yomi: 'hirudoido'
   }
 ];
