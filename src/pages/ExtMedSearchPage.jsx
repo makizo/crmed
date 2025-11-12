@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { extMedValue } from '../data/extMedValue';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { extMedValue } from "../data/extMedValue";
 
 function ExtMedSearchPage() {
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [filteredResults, setFilteredResults] = useState(extMedValue);
 
   // インクリメンタルサーチ（medNameとyomiの両方を検索対象）
   useEffect(() => {
-    if (searchText.trim() === '') {
+    if (searchText.trim() === "") {
       setFilteredResults(extMedValue);
     } else {
-      const filtered = extMedValue.filter(item => {
+      const filtered = extMedValue.filter((item) => {
         const searchLower = searchText.toLowerCase();
         const medNameMatch = item.medName.toLowerCase().includes(searchLower);
         const yomiMatch = item.yomi.toLowerCase().includes(searchLower);
@@ -25,7 +25,7 @@ function ExtMedSearchPage() {
   return (
     <div className="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-lg">
       <button
-        onClick={() => navigate('/')}
+        onClick={() => navigate("/")}
         className="mb-6 text-blue-600 hover:text-blue-800 flex items-center"
       >
         ← トップページに戻る
@@ -33,8 +33,21 @@ function ExtMedSearchPage() {
 
       <h2 className="text-3xl font-bold mb-6 text-purple-600">外用剤検索</h2>
 
+      <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-4 rounded">
+        <p className="font-medium mb-2">使い方</p>
+        <ul className="space-y-1 list-disc list-inside">
+          <li>
+            検索ボックスに薬剤名または読みの一部を入力すると、リアルタイムで絞り込まれます
+          </li>
+          <li>大文字・小文字、ひらがな・カタカナは区別されません</li>
+          <li>空欄にすると全件表示されます</li>
+        </ul>
+      </div>
+
       <div className="mb-6">
-        <label className="block text-sm font-medium mb-2">検索（薬剤名・読み）</label>
+        <label className="block text-sm font-medium mb-2">
+          検索（薬剤名・読み）
+        </label>
         <input
           type="text"
           value={searchText}
@@ -57,7 +70,8 @@ function ExtMedSearchPage() {
               className="border-2 border-gray-200 rounded-lg p-4 hover:shadow-md transition hover:border-purple-300"
             >
               <p className="text-lg">
-                <span className="font-bold">{item.medName}</span>：{item.contentValue}
+                <span className="font-bold">{item.medName}</span>：
+                {item.contentValue}
               </p>
             </div>
           ))
@@ -66,15 +80,6 @@ function ExtMedSearchPage() {
             該当する薬剤が見つかりませんでした
           </div>
         )}
-      </div>
-
-      <div className="mt-6 text-sm text-gray-600 bg-gray-50 p-4 rounded">
-        <p className="font-medium mb-2">使い方</p>
-        <ul className="space-y-1 list-disc list-inside">
-          <li>検索ボックスに薬剤名または読みの一部を入力すると、リアルタイムで絞り込まれます</li>
-          <li>大文字・小文字、ひらがな・カタカナは区別されません</li>
-          <li>空欄にすると全件表示されます</li>
-        </ul>
       </div>
     </div>
   );
