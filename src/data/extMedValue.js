@@ -1,4 +1,14 @@
 export const extMedValue = [
+  {
+    medName: 'ゼビアックスローション 2％',
+    contentValue: '10g',
+    yomi: 'zebiakkusurosyonn'
+  },
+  {
+    medName: 'ベピオゲル 2.5％',
+    contentValue: '15g',
+    yomi: 'bepio'
+  },
   { 
     medName: 'クレナフィン',
     contentValue: '3.56g', 
