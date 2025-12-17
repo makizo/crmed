@@ -27,6 +27,15 @@ function HomePage() {
         </div>
 
         <div
+          onClick={() => navigate('/dnstage')}
+          className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer border-2 border-blue-100 hover:border-blue-300"
+        >
+          <div className="text-4xl mb-4">🧮</div>
+          <h2 className="text-xl font-bold mb-2">糖尿病性腎症ステージ判定</h2>
+          <p className="text-gray-600">eGFRとアルブミン尿でステージを算出</p>
+        </div>
+
+        <div
           onClick={() => navigate('/steroid')}
           className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer border-2 border-purple-100 hover:border-purple-300"
         >
@@ -44,14 +53,6 @@ function HomePage() {
           <p className="text-gray-600">外用剤の標準的な単位量を確認できます</p>
         </div>
 
-        <div
-          onClick={() => navigate('/dnstage')}
-          className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer border-2 border-blue-100 hover:border-blue-300"
-        >
-          <div className="text-4xl mb-4">🧮</div>
-          <h2 className="text-xl font-bold mb-2">糖尿病性腎症ステージ判定</h2>
-          <p className="text-gray-600">eGFRとアルブミン尿でステージを算出</p>
-        </div>
         <div
           onClick={() => navigate('/extmedsearch')}
           className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition cursor-pointer border-2 border-purple-100 hover:border-purple-300"
