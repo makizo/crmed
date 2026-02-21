@@ -48,5 +48,35 @@ export const extMedValue = [
     medName: 'ヒルドイドローション・ゲル',
     contentValue: '50g',
     yomi: 'hirudoido'
+  },
+  {
+    medName: 'ヒルドイドクリーム',
+    contentValue: '25g, 50g, 100g, 500g',
+    yomi: 'hirudoido'
+  },
+  {
+    medName: 'ウレパールローション',
+    contentValue: '20g, 50g',
+    yomi: 'urepal'
+  },
+  {
+    medName: 'ウレパールクリーム',
+    contentValue: '20g, 50g, 500g',
+    yomi: 'urapal'
+  },
+  {
+    medName: 'ケラチナミンクリーム',
+    contentValue: '25g, 50g, 500g',
+    yomi: 'kerachinamin'
+  },
+  {
+    medName: 'ゲーベンクリーム',
+    contentValue: '50g, 100g, 500g',
+    yomi: 'gebenkurimu'
+  },
+  {
+    medName: 'ユベラ軟膏',
+    contentValue: '56g, 500g',
+    yomi: 'yubera'
   }
 ];
